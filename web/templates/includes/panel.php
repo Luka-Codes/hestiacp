@@ -29,30 +29,47 @@
 								<?= htmlspecialchars($user) ?>
 							</span>
 						</span>
-						<span class="top-bar-usage-item">
-							<i class="fas fa-hard-drive" title="<?= _("Disk") ?>: <?= humanize_usage_size($panel[$user]["U_DISK"]) ?> <?= humanize_usage_measure($panel[$user]["U_DISK"]) ?>"></i>
-							<span class="u-text-bold">
-								<?= humanize_usage_size($panel[$user]["U_DISK"]) ?>
-							</span>
-							<?= humanize_usage_measure($panel[$user]["U_DISK"]) ?>
-							/
-							<span class="u-text-bold">
-							<?= humanize_usage_size($panel[$user]["DISK_QUOTA"]) ?>
-							</span>
-							<?= humanize_usage_measure($panel[$user]["DISK_QUOTA"]) ?>
-						</span>
-						<span class="top-bar-usage-item">
-							<i class="fas fa-right-left" title="<?= _("Bandwidth") ?>: <?= humanize_usage_size($panel[$user]["U_BANDWIDTH"]) ?> <?= humanize_usage_measure($panel[$user]["U_BANDWIDTH"]) ?>"></i>
-							<span class="u-text-bold">
-								<?= humanize_usage_size($panel[$user]["U_BANDWIDTH"]) ?>
-							</span>
-							<?= humanize_usage_measure($panel[$user]["U_BANDWIDTH"]) ?>
-							/
-							<span class="u-text-bold">
-								<?= humanize_usage_size($panel[$user]["BANDWIDTH"]) ?>
-							</span>
-							<?= humanize_usage_measure($panel[$user]["BANDWIDTH"]) ?>
-						</span>
+				<span class="top-bar-usage-item">
+				    <i class="fas fa-hard-drive" title="<?= _("Disk") ?>: <?= humanize_usage_size($panel[$user]["U_DISK"]) ?> <?= humanize_usage_measure($panel[$user]["U_DISK"]) ?>"></i>
+ 				   <?php
+ 			   $total_disk = 0;
+    				exec(HESTIA_CMD . "v-list-users json", $out);
+   					 $users = json_decode(implode("", $out), true);
+  						  foreach ($users as $u => $data) {
+    					    $total_disk += intval($data["U_DISK"]);
+    }
+    unset($out);
+    $disk_total = disk_total_space("/");
+    $disk_total_gb = round($disk_total / 1073741824, 1) . "G";
+    ?>
+    <?php if ($panel[$user]["DISK_QUOTA"] === "unlimited"): ?>
+        <span class="u-text-bold"><?= humanize_usage_size($total_disk) ?></span>
+        <?= humanize_usage_measure($total_disk) ?>
+        /
+        <span class="u-text-bold"><?= $disk_total_gb ?></span>
+    <?php else: ?>
+        <span class="u-text-bold"><?= humanize_usage_size($panel[$user]["U_DISK"]) ?></span>
+        <?= humanize_usage_measure($panel[$user]["U_DISK"]) ?>
+        /
+        <span class="u-text-bold"><?= humanize_usage_size($panel[$user]["DISK_QUOTA"]) ?></span>
+        <?= humanize_usage_measure($panel[$user]["DISK_QUOTA"]) ?>
+    <?php endif; ?>
+</span>
+<span class="top-bar-usage-item">
+    <?php $total_bw = 0; foreach ($users as $u => $data) { $total_bw += intval($data["U_BANDWIDTH"]); } ?>
+    <i class="fas fa-right-left" title="<?= _("Bandwidth") ?>: <?= humanize_usage_size($total_bw) ?> <?= humanize_usage_measure($total_bw) ?>"></i>
+    <span class="u-text-bold">
+        <?= humanize_usage_size($total_bw) ?>
+    </span>
+    <?= humanize_usage_measure($total_bw) ?>
+    /
+    <?php if ($panel[$user]["BANDWIDTH"] === "unlimited"): ?>
+        <span class="u-text-bold">∞</span>
+    <?php else: ?>
+        <span class="u-text-bold"><?= humanize_usage_size($panel[$user]["BANDWIDTH"]) ?></span>
+        <?= humanize_usage_measure($panel[$user]["BANDWIDTH"]) ?>
+    <?php endif; ?>
+</span>
 					</div>
 				</div>
 
